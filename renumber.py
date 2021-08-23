@@ -54,7 +54,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import filtfilt, butter
 import datetime  
 from suntime import Sun
-from testsub import dofile
+from testsub import doplot
 from WWV_utility2 import time_string_to_decimals
 
 
@@ -72,11 +72,12 @@ homepath = "E:\\Documents\\PSWS\\"  # set your windows path, comment out for Pi
 
 names = open(homepath+"renumfiles.txt","r")
 
-NodeNum = names.readline()
+Ntemp = names.readline()
+NodeNum = Ntemp.strip("\n")
 #nn=NodeNum
 print(' nodenum ',NodeNum, ' ',len(NodeNum))
 
-if len(NodeNum) != 9:      # 8 + Cr
+if len(NodeNum) != 8:      
     print('Need node number')
     sys.exit(0)
 
@@ -102,5 +103,5 @@ while True:
         sys.exit(0)
         
                
-    dofile(todofile,PlotDir,XferDir)
+    doplot(NodeNum,todofile,PlotDir,XferDir)
 

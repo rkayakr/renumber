@@ -15,7 +15,7 @@ from scipy.signal import filtfilt, butter
 from WWV_utility2 import time_string_to_decimals
 
 
-def dofile(todofile,PlotDir,XferDir):
+def doplot(NodeNum,todofile,PlotDir,XferDir):
     print(' in test ',todofile,'\n')
     
     with open(todofile, 'r') as dataFile:
@@ -37,7 +37,7 @@ def dofile(todofile,PlotDir,XferDir):
             print('\nExtracted UTC_DT only = ' + UTC_DT)
             UTCDTZ=UTCDTZ.replace(':','') # remove the semicolons
             print('\ncorrected UTCDTZ =', UTCDTZ)
-            node= Header[2]
+            node= NodeNum
     #        print('Node =', node)
             GridSqr = Header[3]
     #        print('GridSqr =', GridSqr)
@@ -323,7 +323,7 @@ def dofile(todofile,PlotDir,XferDir):
 
     print('Plot File: ' + GraphFile + '\n')  # indicate plot file name for crontab printout
 
-
+'''
     #-------------------------------------------------------------------
     # Check to see if the autoxfer file exists; if not, skip copying the plot
 #    if (path.exists(autoxferfile)):
@@ -337,7 +337,7 @@ def dofile(todofile,PlotDir,XferDir):
 
     #-------------------------------------------------------------------
     # Check to see if the autoplot file exists; if not, skip the plot
-'''
+
     if (path.exists(autoplotfile)):
         print('autoplot enable File found - Processing Plot...\n')
         subprocess.call('gpicview ' + PlotGraphFile +' &', shell=True)   #create shell and plot the data from graph file
