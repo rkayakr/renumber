@@ -82,7 +82,9 @@ if len(NodeNum) != 9:      # 8 + Cr
 
 PROCESSDIR = homepath + 'Srawdata/'
 RenumDir = homepath + 'Renum/'
-
+#saved plot directrory
+PlotDir = homepath + 'Renum/'
+XferDir = homepath + 'Renum/'
 while True:
     Ftemp = names.readline()
     if  len(Ftemp) <= 1:
@@ -100,5 +102,5 @@ while True:
         sys.exit(0)
         
                
-    dofile(todofile)
+    dofile(todofile,PlotDir,XferDir)
 
