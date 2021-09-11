@@ -3,7 +3,7 @@
 """
 Renumnber V1.0 built on multiPlot v1.2
 
-Renumber version v1.0 reads a node number and then processes files in a list
+Renumber version v1.0 reads a node number and then processes a list of raw analysis files
 opening each, processing  and writing data and plot files with the new node number
 
 modified from WWV_plt2.py @authors dkazdan jgibbons
@@ -13,9 +13,7 @@ leaves plot in Renum directory
 windows version hardcoded homepath directory location
 for Pi comment out windows homepath and uncomment Pi  lines
 
-uses sub_WWV_plt2.py
-uses WWV_utility2.py
-Bob Benedict, KD8CGH, 7/29/2021
+Bob Benedict, KD8CGH, 9/10/2021
 
 create text file "renumfiles.txt" in homepath directory
   node number
@@ -34,11 +32,7 @@ for each file
 
 uses
 WWV_utility2.py
-20 February 2020
-WWV utility file
-Routines and classes used in WWV file management and graphing
-David Kazdan, AD8Y
-John Gibbons, N8OBJ - mods to plot header 2/3/20
+doplot.py
 
 """
 
@@ -54,7 +48,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import filtfilt, butter
 import datetime  
 from suntime import Sun
-from testsub import doplot
+from doplot import doplot
 from WWV_utility2 import time_string_to_decimals
 
 
@@ -103,5 +97,5 @@ while True:
         sys.exit(0)
         
                
-    doplot(NodeNum,todofile,PlotDir,XferDir)
+    doplot(NodeNum,todofile,PlotDir)
 

@@ -1,5 +1,6 @@
 '''
-testsub
+plots and writes file with new node number
+called for each file in list
 
 
 '''
@@ -15,9 +16,10 @@ from scipy.signal import filtfilt, butter
 from WWV_utility2 import time_string_to_decimals
 
 
-def doplot(NodeNum,todofile,PlotDir,XferDir):
+def doplot(NodeNum,todofile,PlotDir):
     print(' in test ',todofile,'\n')
-    
+#    open
+
     with open(todofile, 'r') as dataFile:
         dataReader=csv.reader(dataFile)
         data = list(dataReader)
@@ -54,20 +56,6 @@ def doplot(NodeNum,todofile,PlotDir,XferDir):
             beacon = Header[9]
     #        print('Beacon =', beacon)
 
-        # Try using original FLdigi format w/o info line fake all data
-    #    if (Header[0] == "UTC"):
-    #        print('Detected Original FLDigi Header Format')
-    #        UTCDTZ = "2020-00-00T00:00:00Z"
-    #        node= "N00000"
-    #        Lat = '00.00000'
-    #        Long = '-00.00000'
-    #        Elev = '000'
-    #        print('GridSqr =', GridSqr)
-    #        citystate = 'NOcity NOstate'
-    #        RadioID = SRID
-    #        beacon = "Unknown"
-    #        NewHdr = 'FLDigi'
-
         if (NewHdr == 'Unknown'):
             ChkDate = Header[0]  # load in first row entry
             Cent = ChkDate[:2] # check first 2 digits  = 20?
@@ -98,19 +86,6 @@ def doplot(NodeNum,todofile,PlotDir,XferDir):
     #            print('Beacon =', beacon)
                 NewHdr = 'Old'
 
-        #sys.exit(0)
-        # Diagnostic settings for forced frequency testing of days data
-        #beacon = 'Unknown'
-        #beacon = 'WWV2p5'
-        #beacon = 'WWV5'
-        #beacon = 'WWV10'
-        #beacon = 'WWV15'
-        #beacon = 'WWV20'
-        #beacon = 'WWV25'
-        #beacon = 'CHU3'
-        #beacon = 'CHU7'
-        #beacon = 'CHU14'
-
         print('Header Decode =',NewHdr)
         #print('Scanning for UTC header line')
 
@@ -120,6 +95,13 @@ def doplot(NodeNum,todofile,PlotDir,XferDir):
     #sys.exit(0)
     print('Ready to start processing records')
     #sys.exit(0)
+    
+    outfile=PlotDir+UTCDTZ+'.csv'
+    out=open(outfile,'a', newline='')
+    write_csv= csv.writer(out,  delimiter=',')
+    write_csv.writerow([Header[0],Header[1],Header[2],Header[3],Header[4],Header[5],Header[6],Header[7],Header[8],Header[9]])
+        
+    UTCDTZ
     # Prepare data arrays
     hours=[]
     Doppler=[]
@@ -133,16 +115,29 @@ def doplot(NodeNum,todofile,PlotDir,XferDir):
     recordcnt  = 0
     freqcalc = 0
     calccnt = 0
-
+    rownum=1;
+    
     for row in data:
+        if (rownum < 18):
+            print(row[0])
+            if (rownum != 4):
+                out.write(row[0]+'\n')
+            else:
+                out.write('# Station Node Number      '+NodeNum+'\n')
+     
+        rownum=rownum+1
+                
         if (FindUTC == 0):
             #print('looking for UTC - row[0] =',row[0])
             if (row[0] == 'UTC'):
                 FindUTC = 1
     #            print('UTC found =', row[0])
+                out.write('UTC,Freq,Vpk\n')
         else:
             #print('Processing record')
             decHours=time_string_to_decimals(row[0])
+            out.write(row[0]+', '+row[1]+', '+row[3]+'\n')
+
             if (NewHdr != 'New'):
                 if (calccnt  < 101):
                     calcnt = calcnt+1
@@ -153,8 +148,7 @@ def doplot(NodeNum,todofile,PlotDir,XferDir):
                 hours.append(decHours) # already in float because of conversion to decimal hours.
                 Doppler.append(float(row[2])) # frequency offset from col 2
                 Vpk.append (float(row[3])) # Get Volts peak from col 3
-                Power_dB.append (float(row[4])) # log power from col 4
-
+                Power_dB.append (float(row[4])) # log power from col 4           
 
     if (NewHdr != 'New'):
 
@@ -199,7 +193,8 @@ def doplot(NodeNum,todofile,PlotDir,XferDir):
 
         print('Calc Beacon ID =',beacon)
 
-    # Find max and min of Power_dB for graph preparation:
+
+# Find max and min of Power_dB for graph preparation:
     min_power=np.amin(Power_dB) # will use for graph axis min
     max_power=np.amax(Power_dB) # will use for graph axis max
     min_Vpk=np.amin(Vpk) # min Vpk
@@ -314,7 +309,8 @@ def doplot(NodeNum,todofile,PlotDir,XferDir):
     #GraphFile = yesterdaystr + '_' + node + '_' + RadioID + '_' + GridSqr + '_' + beacon + '_graph.png'
     GraphFile = UTCDTZ + '_' + node + '_' + RadioID + '_' + GridSqr + '_' + beacon + '_graph.png'
     PlotGraphFile = PlotDir + GraphFile
-    XferGraphFile = XferDir + GraphFile
+    
+#    XferGraphFile = XferDir + GraphFile
 
     # create plot
     #plt.savefig(PlotDir + yesterdaystr + '_' + node + '_' +  GridSqr + '_' +  RadioID + '_' +  beacon + '_graph.png', dpi=250, orientation='landscape')
@@ -322,28 +318,5 @@ def doplot(NodeNum,todofile,PlotDir,XferDir):
     # =============================================================================
 
     print('Plot File: ' + GraphFile + '\n')  # indicate plot file name for crontab printout
-
-'''
-    #-------------------------------------------------------------------
-    # Check to see if the autoxfer file exists; if not, skip copying the plot
-#    if (path.exists(autoxferfile)):
-#        print('autoxfer enable File found\n')
-#        # copy plot file to transfer directory
-#        print('Copying file to Sxfer directory for upload ',XferGraphFile)  # Copy final processed data file also to /Sxfer/ directory for transfer
-    shutil.copy(PlotGraphFile, XferGraphFile)
-
-#    else:
-#        print('No autoxfer enable File found - exiting')
-
-    #-------------------------------------------------------------------
-    # Check to see if the autoplot file exists; if not, skip the plot
-
-    if (path.exists(autoplotfile)):
-        print('autoplot enable File found - Processing Plot...\n')
-        subprocess.call('gpicview ' + PlotGraphFile +' &', shell=True)   #create shell and plot the data from graph file
-    else:
-        print('No autoplot enable File found - exiting')
-    #-----------------------------------------------
-'''
-    #subprocess.call('gpicview ' + GraphFile +' &', shell=True)   #create shell and plot the data from graph file
-
+    out.close
+  
