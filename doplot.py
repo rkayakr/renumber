@@ -96,7 +96,7 @@ def doplot(NodeNum,todofile,PlotDir):
     print('Ready to start processing records')
     #sys.exit(0)
     
-    outfile=PlotDir+UTCDTZ+'.csv'
+    outfile=PlotDir+UTCDTZ+'_'+NodeNum+'_G1_'+GridSqr+'_FRQ_'+beacon+'.csv'
     out=open(outfile,'a', newline='')
     write_csv= csv.writer(out,  delimiter=',')
     write_csv.writerow([Header[0],Header[1],Header[2],Header[3],Header[4],Header[5],Header[6],Header[7],Header[8],Header[9]])
